@@ -1,4 +1,4 @@
-# Anotaciones - TRABAJO FINAL - dApp funcinoal
+# Anotaciones - TRABAJO FINAL - dApp funcional
 
 ### FLUJO 1:
 
@@ -9,15 +9,15 @@
 - Debajo de la página habrá un botón que diga "Generar NFT de TP final PRUEBA"
 
 Validaciones necesarias:
-_a. Verificar que sean 10 NFTs distintos:_ 
-  Usar ID/tokenURI o metadata.
-_b. Validar que fueron emitidos antes del 28/05/25_:
-  Acceder a la fecha de minteo: normalmente no está en el NFT directamente, pero se puede obtener:
-    Con historial de eventos del contrato (mint) vía Alchemy o Etherscan.
-    O si vos minteás con una fecha como atributo del metadata en el pasado.
-_c. Verificar que no fueron transferidos:_
-  Requiere consultar el historial de transferencias por token ID.
-  Alchemy o Etherscan API → buscar si el token ID tuvo más de una transferencia (de la address del contrato a otra = mint, de ahí en adelante = retransferencia).
+- _a. Verificar que sean 10 NFTs distintos:_ 
+  - Usar ID/tokenURI o metadata.
+- _b. Validar que fueron emitidos antes del 28/05/25_:
+  - Acceder a la fecha de minteo: normalmente no está en el NFT directamente, pero se puede obtener:
+    - Con historial de eventos del contrato (mint) vía Alchemy o Etherscan.
+    - O si vos minteás con una fecha como atributo del metadata en el pasado.
+- _c. Verificar que no fueron transferidos:_
+  - Requiere consultar el historial de transferencias por token ID.
+  - Alchemy o Etherscan API → buscar si el token ID tuvo más de una transferencia (de la address del contrato a otra = mint, de ahí en adelante = retransferencia).
 
   🔧 Pseudocódigo resumido – tareas críticas
 
@@ -109,14 +109,14 @@ Los NFTs “nuevos” a crear no implican desplegar nuevos contratos cada vez. L
   await contract.mint(toAddress, tokenId, amount, metadataURI)
 }
 
-El NFT se emite directamente a la wallet address del usuario conectado (caso de prueba).
-_Luego se modificará esto para que se le envie el NFT a quien defina el desarrollado_
+- El NFT se emite directamente a la wallet address del usuario conectado (caso de prueba).
+  - _Luego se modificará esto para que se le envie el NFT a quien defina el desarrollado_
 
 Se podría guardar un registro interno si fuese necesario (off-chain o en una base).
-
+#
 ### FLUJO 2:
 - Solo los holders de ese NFT creado y enviado en el FLUJO 1 van a visualizar con opacidad y podrán presionar el botón "Promocionar"
-_Esto se hace filtrando los NFTs actuales con ese título o id_
+  - _Esto se hace filtrando los NFTs actuales con ese título o id_
 
 🟥 PSEUDOCÓDIGO: Verificar si el usuario posee el NFT TP FINAL PRUEBA (para habilitar botón Promocionar)
 
