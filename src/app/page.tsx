@@ -15,6 +15,7 @@ export default function Home() {
   const [inputAddress, setInputAddress] = useState<string>("");
   const [nfts, setNfts] = useState<any[]>([]);
   const [selectedNFT, setSelectedNFT] = useState<any | null>(null);
+  const [selectedUNQNFT, setSelectedUNQNFT] = useState<any | null>(null);
   const [nftVariables, setNftVariables] = useState<any>({});
 
   const connectWallet = async () => {
@@ -57,42 +58,50 @@ export default function Home() {
 
   const selectNFT = async (nft: any) => {
     setSelectedNFT(nft);
-    // Conectarse a Sepolia
-    const provider = new ethers.JsonRpcProvider(
-      "https://eth-sepolia.g.alchemy.com/v2/Nlzylkya5AxqJTje7TUxxLwLeJbF5Ed6"
-    );
+    console.log(nft.title)
+    if (
+      nft.title ===
+      "Seminario de Blockchain - NFT Certificador de Temas"
+    ) {
+      // Conectarse a Sepolia
+      const provider = new ethers.JsonRpcProvider(
+        "https://eth-sepolia.g.alchemy.com/v2/Nlzylkya5AxqJTje7TUxxLwLeJbF5Ed6"
+      );
 
-    // Dirección del contrato
-    const contractAddress = nft.contract.address;
+      // Dirección del contrato
+      const contractAddress = nft.contract.address;
 
-    // ABI mínimo necesario para ERC-1155
-    const abi = [
-      // ABI solo con la función que necesitás
-      {
-        inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-        name: "datosDeClases",
-        outputs: [
-          { internalType: "uint256", name: "clase", type: "uint256" },
-          { internalType: "string", name: "tema", type: "string" },
-          { internalType: "address", name: "alumno", type: "address" },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-    ];
+      // ABI mínimo necesario para ERC-1155
+      const abi = [
+        // ABI solo con la función que necesitás
+        {
+          inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+          name: "datosDeClases",
+          outputs: [
+            { internalType: "uint256", name: "clase", type: "uint256" },
+            { internalType: "string", name: "tema", type: "string" },
+            { internalType: "address", name: "alumno", type: "address" },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ];
 
-    // Instancia del contrato
-    const contract = new ethers.Contract(contractAddress, abi, provider);
-    // Llamar al URI
-    const tokenId = nft.id.tokenId;
+      // Instancia del contrato
+      const contract = new ethers.Contract(contractAddress, abi, provider);
+      // Llamar al URI
+      const tokenId = nft.id.tokenId;
 
-    const result = await contract.datosDeClases(tokenId);
+      const result = await contract.datosDeClases(tokenId);
 
-    setNftVariables({
-      clase: Number(result.clase),
-      tema: result.tema,
-      alumno: result.alumno,
-    });
+      setNftVariables({
+        clase: Number(result.clase),
+        tema: result.tema,
+        alumno: result.alumno,
+      });
+
+      setSelectedUNQNFT(nft);
+    }
   };
 
   return (
@@ -172,29 +181,27 @@ export default function Home() {
               {selectedNFT.description || "Sin descripción"}
             </p>
             <p>
-              <strong>Token ID:</strong> {Number(selectedNFT.id?.tokenId) || "N/A"}
+              <strong>Token ID:</strong>{" "}
+              {Number(selectedNFT.id?.tokenId) || "N/A"}
             </p>
-            <p>
-              <strong>Contrato:</strong> {selectedNFT.contract?.address}
-            </p>
-
-            <p>
-              <strong>Tema:</strong> {nftVariables.tema || "N/A"}
-            </p>
-
-            <p>
-              <strong>Clase:</strong> {nftVariables.clase || "N/A"}
-            </p>
-
-            <p>
-              <strong>Alumno:</strong> {nftVariables.alumno || "N/A"}
-            </p>
-
+            {selectedUNQNFT && (
+              <div>
+                <p>
+                  <strong>Clase:</strong> {nftVariables.clase || "N/A"}
+                </p>
+                <p>
+                  <strong>Tema:</strong> {nftVariables.tema || "N/A"}
+                </p>
+                <p>
+                  <strong>Alumno:</strong> {nftVariables.alumno || "N/A"}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-center mt-6">
             <button
-              onClick={() => setSelectedNFT(null)}
+              onClick={() => {setSelectedNFT(null), setSelectedUNQNFT(null)}}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-all"
             >
               Cerrar
