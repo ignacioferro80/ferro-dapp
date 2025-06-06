@@ -1,8 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ethers } from "ethers";
+import { validarNFTsUNQ } from "@/app/utils/validarNFTsUNQ";
+import {
+  ALCHEMY_API_KEY,
+  UNQ_CONTRACT_ADDRESS,
+  UNQ_CONTRACT_ABI,
+} from "@/app/utils/constantes";
 
 declare global {
   interface Window {
@@ -17,6 +24,26 @@ export default function Home() {
   const [selectedNFT, setSelectedNFT] = useState<any | null>(null);
   const [selectedUNQNFT, setSelectedUNQNFT] = useState<any | null>(null);
   const [nftVariables, setNftVariables] = useState<any>({});
+  const [nftsValidos, setNftsValidos] = useState(false);
+
+  const provider = new ethers.JsonRpcProvider(
+    `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+  );
+  const unqContract = new ethers.Contract(
+    UNQ_CONTRACT_ADDRESS,
+    UNQ_CONTRACT_ABI,
+    provider
+  );
+
+  useEffect(() => {
+    if (walletAddress && window.ethereum) {
+      (async () => {
+        const validos = await validarNFTsUNQ(walletAddress);
+        console.log("NFTs válidos:", validos);
+        setNftsValidos(validos);
+      })();
+    }
+  }, [walletAddress]);
 
   const connectWallet = async () => {
     if (typeof window.ethereum !== "undefined") {
@@ -39,7 +66,7 @@ export default function Home() {
   const fetchNFTs = async (address: string) => {
     try {
       const response = await fetch(
-        `https://eth-sepolia.g.alchemy.com/nft/v2/Nlzylkya5AxqJTje7TUxxLwLeJbF5Ed6/getNFTs?owner=${address}`
+        `https://eth-sepolia.g.alchemy.com/nft/v2/${ALCHEMY_API_KEY}/getNFTs?owner=${address}`
       );
       const data = await response.json();
       setNfts(data.ownedNfts || []);
@@ -58,41 +85,18 @@ export default function Home() {
 
   const selectNFT = async (nft: any) => {
     setSelectedNFT(nft);
-    console.log(nft.title)
     if (
-      nft.title ===
-      "Seminario de Blockchain - NFT Certificador de Temas"
+      nft.contract.address.toLowerCase() === UNQ_CONTRACT_ADDRESS.toLowerCase()
     ) {
-      // Conectarse a Sepolia
-      const provider = new ethers.JsonRpcProvider(
-        "https://eth-sepolia.g.alchemy.com/v2/Nlzylkya5AxqJTje7TUxxLwLeJbF5Ed6"
-      );
-
-      // Dirección del contrato
-      const contractAddress = nft.contract.address;
-
-      // ABI mínimo necesario para ERC-1155
-      const abi = [
-        // ABI solo con la función que necesitás
-        {
-          inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-          name: "datosDeClases",
-          outputs: [
-            { internalType: "uint256", name: "clase", type: "uint256" },
-            { internalType: "string", name: "tema", type: "string" },
-            { internalType: "address", name: "alumno", type: "address" },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-      ];
-
-      // Instancia del contrato
-      const contract = new ethers.Contract(contractAddress, abi, provider);
       // Llamar al URI
       const tokenId = nft.id.tokenId;
 
-      const result = await contract.datosDeClases(tokenId);
+      if (!unqContract) {
+        console.error("El contrato no está inicializado.");
+        return;
+      }
+
+      const result = await unqContract.datosDeClases(tokenId);
 
       setNftVariables({
         clase: Number(result.clase),
@@ -113,7 +117,7 @@ export default function Home() {
       <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-6">
         <button
           onClick={connectWallet}
-          className="px-6 py-3 bg-white text-blue-800 font-semibold rounded-xl shadow-md hover:scale-105 hover:bg-blue-100 transition-all duration-300"
+          className="px-6 py-3 bg-white text-blue-800 font-semibold rounded-xl shadow-md hover:scale-102 cursor-pointer hover:bg-blue-100 transition-all duration-300"
         >
           Conectar con MetaMask
         </button>
@@ -128,7 +132,7 @@ export default function Home() {
           />
           <button
             onClick={handleSearch}
-            className="px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-all"
+            className="px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 cursor-pointer transition-all"
           >
             Buscar NFTs
           </button>
@@ -140,7 +144,7 @@ export default function Home() {
           <div
             key={index}
             onClick={() => selectNFT(nft)}
-            className="cursor-pointer bg-white text-black rounded-xl p-4 shadow-lg hover:scale-105 transition-transform duration-300"
+            className="cursor-pointer bg-white text-black rounded-xl p-4 shadow-lg hover:scale-102 transition-transform duration-300"
           >
             {nft.media && nft.media[0]?.gateway ? (
               <Image
@@ -159,6 +163,30 @@ export default function Home() {
           </div>
         ))}
       </div>
+
+      {walletAddress && (
+        <div
+          className={`flex flex-col md:flex-row justify-center items-center
+        }`}
+        >
+          <Link href="/envio-nft">
+            <button
+              className={`gap-4 mb-6 px-6 py-3 m-10 font-semibold rounded-xl shadow-md cursor-pointer
+        ${
+          nftsValidos
+            ? "text-green-800 hover:scale-101 bg-green-100 hover:bg-green-200 transition-all duration-600"
+            : "bg-gray-200 text-gray-500"
+        }`}
+              disabled={!nftsValidos}
+              onClick={() => {
+                "/enviar-nft";
+              }}
+            >
+              Enviar NFT Trabjo Práctico Integrador
+            </button>
+          </Link>
+        </div>
+      )}
 
       {selectedNFT && (
         <div className="mt-10 bg-white text-black rounded-xl p-6 shadow-xl max-w-3xl mx-auto">
@@ -184,6 +212,7 @@ export default function Home() {
               <strong>Token ID:</strong>{" "}
               {Number(selectedNFT.id?.tokenId) || "N/A"}
             </p>
+
             {selectedUNQNFT && (
               <div>
                 <p>
@@ -201,8 +230,10 @@ export default function Home() {
 
           <div className="flex justify-center mt-6">
             <button
-              onClick={() => {setSelectedNFT(null), setSelectedUNQNFT(null)}}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-all"
+              onClick={() => {
+                setSelectedNFT(null), setSelectedUNQNFT(null);
+              }}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 cursor-pointer transition-all"
             >
               Cerrar
             </button>
