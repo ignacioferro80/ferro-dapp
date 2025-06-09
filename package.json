@@ -10,17 +10,21 @@
   },
   "dependencies": {
     "@ethersproject/providers": "^5.8.0",
-    "ethers": "^6.14.3",
     "next": "15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@metamask/providers": "^22.1.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@openzeppelin/contracts": "^5.3.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^16.5.0",
+    "ethers": "^5.8.0",
+    "hardhat": "^2.24.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

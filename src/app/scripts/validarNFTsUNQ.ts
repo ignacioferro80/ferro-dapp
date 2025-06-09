@@ -1,13 +1,7 @@
-import {
-  ALCHEMY_API_KEY,
-  UNQ_CONTRACT_ADDRESS,
-  LIMITE_TIMESTAMP,
-} from "./constantes";
-
 export const validarNFTsUNQ = async (address: string): Promise<boolean> => {
   try {
     const response = await fetch(
-      `https://eth-sepolia.g.alchemy.com/nft/v2/${ALCHEMY_API_KEY}/getNFTs?owner=${address}`
+      `https://eth-sepolia.g.alchemy.com/nft/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}/getNFTs?owner=${address}`
     );
     const data = await response.json();
     const nfts = data.ownedNfts || [];
@@ -15,7 +9,7 @@ export const validarNFTsUNQ = async (address: string): Promise<boolean> => {
     const unqNfts = nfts.filter(
       (nft: any) =>
         nft.contract.address.toLowerCase() ===
-        UNQ_CONTRACT_ADDRESS.toLowerCase()
+        process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!.toLowerCase()
     );
 
     const validNfts: any[] = [];
@@ -25,7 +19,7 @@ export const validarNFTsUNQ = async (address: string): Promise<boolean> => {
       const tokenId = BigInt(tokenIdHex).toString();
 
       const transfersResponse = await fetch(
-        `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+        `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
         {
           method: "POST",
           headers: {
@@ -40,7 +34,7 @@ export const validarNFTsUNQ = async (address: string): Promise<boolean> => {
                 fromBlock: "0x0",
                 toBlock: "latest",
                 toAddress: address,
-                contractAddresses: [UNQ_CONTRACT_ADDRESS],
+                contractAddresses: [process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS],
                 category: ["erc1155"],
                 withMetadata: true,
                 excludeZeroValue: false,
@@ -64,7 +58,7 @@ export const validarNFTsUNQ = async (address: string): Promise<boolean> => {
           to?.toLowerCase() === address.toLowerCase() &&
           id?.toString() === tokenId &&
           t.rawContract?.address?.toLowerCase() ===
-            UNQ_CONTRACT_ADDRESS.toLowerCase()
+            process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!.toLowerCase()
         );
       });
 
@@ -90,7 +84,7 @@ export const validarNFTsUNQ = async (address: string): Promise<boolean> => {
         new Date(primerEvento.metadata.blockTimestamp).getTime() / 1000
       );
 
-      if (timestamp >= LIMITE_TIMESTAMP) continue;
+      if (timestamp >= 1748380800) continue;
 
       // NFT válido
       validNfts.push({

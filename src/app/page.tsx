@@ -2,14 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ethers } from "ethers";
-import { validarNFTsUNQ } from "@/app/utils/validarNFTsUNQ";
-import {
-  ALCHEMY_API_KEY,
-  UNQ_CONTRACT_ADDRESS,
-  UNQ_CONTRACT_ABI,
-} from "@/app/utils/constantes";
+import { validarNFTsUNQ } from "@/app/scripts/validarNFTsUNQ";
+import unqAbi from "@/app/utils/unqAbi.json";
 
 declare global {
   interface Window {
@@ -26,12 +22,15 @@ export default function Home() {
   const [nftVariables, setNftVariables] = useState<any>({});
   const [nftsValidos, setNftsValidos] = useState(false);
 
-  const provider = new ethers.JsonRpcProvider(
-    `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+  const router = useRouter();
+
+  const provider = new ethers.providers.JsonRpcProvider(
+    `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
   );
+
   const unqContract = new ethers.Contract(
-    UNQ_CONTRACT_ADDRESS,
-    UNQ_CONTRACT_ABI,
+    process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!,
+    unqAbi,
     provider
   );
 
@@ -66,7 +65,7 @@ export default function Home() {
   const fetchNFTs = async (address: string) => {
     try {
       const response = await fetch(
-        `https://eth-sepolia.g.alchemy.com/nft/v2/${ALCHEMY_API_KEY}/getNFTs?owner=${address}`
+        `https://eth-sepolia.g.alchemy.com/nft/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}/getNFTs?owner=${address}`
       );
       const data = await response.json();
       setNfts(data.ownedNfts || []);
@@ -86,7 +85,7 @@ export default function Home() {
   const selectNFT = async (nft: any) => {
     setSelectedNFT(nft);
     if (
-      nft.contract.address.toLowerCase() === UNQ_CONTRACT_ADDRESS.toLowerCase()
+      nft.contract.address.toLowerCase() === process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!.toLowerCase()
     ) {
       // Llamar al URI
       const tokenId = nft.id.tokenId;
@@ -169,7 +168,6 @@ export default function Home() {
           className={`flex flex-col md:flex-row justify-center items-center
         }`}
         >
-          <Link href="/envio-nft">
             <button
               className={`gap-4 mb-6 px-6 py-3 m-10 font-semibold rounded-xl shadow-md cursor-pointer
         ${
@@ -179,12 +177,11 @@ export default function Home() {
         }`}
               disabled={!nftsValidos}
               onClick={() => {
-                "/enviar-nft";
+                router.push(`envio-nft?address=${walletAddress}`);
               }}
             >
               Enviar NFT Trabjo Práctico Integrador
             </button>
-          </Link>
         </div>
       )}
 
