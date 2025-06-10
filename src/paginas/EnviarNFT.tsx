@@ -55,8 +55,9 @@ export default function EnviarNFT() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("Enviando NFT:", nombreAlumno);
     if (nombreAlumno.trim()) {
-      console.log(`NFT generado para: ${nombreAlumno}`);
+      mintNFT(nombreAlumno);
     }
   };
 
