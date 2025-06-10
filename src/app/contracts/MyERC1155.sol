@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MyERC1155 is ERC1155, Ownable {
-    string public name = "FERRO NFT TPI";
+    string public name = "NFT TPI";
     string public baseImage = "ipfs://bafkreie4xkcq4w6fdde4fvmnw2hq7q2pitclw7ccnovdzr6oig4x2gomve";
     uint256 public currentTokenId = 0;
 
@@ -21,7 +21,7 @@ contract MyERC1155 is ERC1155, Ownable {
     // El destinatario fijo ahora es solo uno (tu wallet)
     address public destinatario = 0xd614A872961Aa8213283464aFb00F9bfB938d7a1;
 
-    constructor() ERC1155("") {}
+    constructor() ERC1155("") Ownable(msg.sender) {}
 
     function mintNFT(
         string memory _nombreAlumno,

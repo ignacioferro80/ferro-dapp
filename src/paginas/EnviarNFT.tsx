@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import ferrotoken from "@/app/assets/ferrotoken.png";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import mintNFT from "@/app/scripts/mintNFT";
 
 export default function EnviarNFT() {
   const [nombreAlumno, setNombreAlumno] = useState("");
@@ -71,7 +72,7 @@ export default function EnviarNFT() {
 
         {/* Título */}
         <h2 className="text-3xl font-bold text-center mb-6 text-black">
-          FERRO NFT TPI
+          NFT TPI
         </h2>
 
         {/* Formulario */}
