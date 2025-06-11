@@ -109,29 +109,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "string",
-				"name": "_nombreAlumno",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_fecha",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_idsVerificados",
-				"type": "string"
-			}
-		],
-		"name": "mintNFT",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "address",
 				"name": "owner",
 				"type": "address"
@@ -175,6 +152,34 @@
 		],
 		"name": "ApprovalForAll",
 		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_destinatario",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_nombreAlumno",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_fecha",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_idsVerificados",
+				"type": "string"
+			}
+		],
+		"name": "mintNFT",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -461,19 +466,6 @@
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "destinatario",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
 			}
 		],
 		"stateMutability": "view",

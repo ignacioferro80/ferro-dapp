@@ -93,12 +93,8 @@ export const validarNFTsUNQ = async (address: string): Promise<boolean> => {
       });
     }
 
-    console.log("NFTs UNQ válidos:", validNfts);
 
     if (validNfts.length === 10) {
-      console.log(
-        "✅ Cumple con los requisitos para generar el NFT TP FINAL PRUEBA."
-      );
       return true;
     } else {
       console.log(`❌ NO cumple con los requisitos (${validNfts.length}/10).`);

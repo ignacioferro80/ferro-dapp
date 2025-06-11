@@ -19,7 +19,8 @@ export default function Home() {
   const [inputAddress, setInputAddress] = useState<string>("");
   const [nfts, setNfts] = useState<any[]>([]);
   const [selectedNFT, setSelectedNFT] = useState<any | null>(null);
-  const [nftVariables, setNftVariables] = useState<any>({});
+  const [nftUNQVariables, setNftUNQVariables] = useState<any>({});
+  const [nftTPIVariables, setNftTPIVariables] = useState<any>({});
   const [nftsValidos, setNftsValidos] = useState(false);
 
   const router = useRouter();
@@ -38,7 +39,6 @@ export default function Home() {
     if (walletAddress && window.ethereum) {
       (async () => {
         const validos = await validarNFTsUNQ(walletAddress);
-        console.log("NFTs válidos:", validos);
         setNftsValidos(validos);
       })();
     }
@@ -68,7 +68,29 @@ export default function Home() {
         `https://eth-sepolia.g.alchemy.com/nft/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}/getNFTs?owner=${address}`
       );
       const data = await response.json();
-      setNfts(data.ownedNfts || []);
+      for (const nft of data.ownedNfts) {
+        if (
+          nft.contract.address.toLowerCase() ===
+          process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!.toLowerCase()
+        ) {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const contrato = new ethers.Contract(
+            process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!,
+            abi,
+            provider
+          );
+
+          const tokenId = nft.id.tokenId;
+
+          let uri = await contrato.uri(tokenId);
+          let uriHttp = uri.replace("ipfs://", "https://ipfs.io/ipfs/");
+          const imageUrl = uriHttp.replace(/\/[^/]+\.json$/, "/");
+
+          nft.media = [{ gateway: imageUrl }];
+          nft.title = "NFT TPI";
+        }
+        setNfts(data.ownedNfts || []);
+      }
     } catch (err) {
       console.error("Error al obtener NFTs:", err);
     }
@@ -98,7 +120,7 @@ export default function Home() {
 
       const result = await unqContract.datosDeClases(tokenId);
 
-      setNftVariables({
+      setNftUNQVariables({
         clase: Number(result.clase),
         tema: result.tema,
         alumno: result.alumno,
@@ -113,12 +135,11 @@ export default function Home() {
         abi,
         provider
       );
-      const metadata = await contrato.metadatas(nft.id.tokenId);
-      console.log(nft);
 
-      console.log("Metadata del NFT TPI:", metadata);
+      const tokenId = nft.id.tokenId;
+      const metadata = await contrato.metadatas(tokenId);
 
-      setNftVariables({
+      setNftTPIVariables({
         nombre: metadata.nombreAlumno,
         fecha: metadata.fecha,
         idsVerificados: metadata.idsVerificados,
@@ -207,7 +228,6 @@ export default function Home() {
       {selectedNFT && (
         <div className="mt-10 bg-white text-black rounded-xl p-6 shadow-xl max-w-3xl mx-auto">
           <div className="mt-4 space-y-2 text-sm">
-
             {selectedNFT.contract.address.toLowerCase() ===
               process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!.toLowerCase() && (
               <div>
@@ -228,13 +248,13 @@ export default function Home() {
                   {selectedNFT.description || "Sin descripción"}
                 </p>
                 <p>
-                  <strong>Clase:</strong> {nftVariables.clase || "N/A"}
+                  <strong>Clase:</strong> {nftUNQVariables.clase || "N/A"}
                 </p>
                 <p>
-                  <strong>Tema:</strong> {nftVariables.tema || "N/A"}
+                  <strong>Tema:</strong> {nftUNQVariables.tema || "N/A"}
                 </p>
                 <p>
-                  <strong>Alumno:</strong> {nftVariables.alumno || "N/A"}
+                  <strong>Alumno:</strong> {nftUNQVariables.alumno || "N/A"}
                 </p>
               </div>
             )}
@@ -245,17 +265,24 @@ export default function Home() {
                 <h2 className="text-2xl font-bold mb-4 text-center">
                   {selectedNFT.contractMetadata.name || "NFT seleccionado"}
                 </h2>
+                <Image
+                    src={selectedNFT.media[0].gateway}
+                    alt={"NFT TPI"}
+                    width={400}
+                    height={400}
+                    className="rounded-xl mx-auto"
+                  />
                 <p>
                   <strong>Nombre del alumno:</strong>{" "}
-                  {nftVariables.nombre || "N/A"}
+                  {nftTPIVariables.nombre || "N/A"}
                 </p>
                 <p>
                   <strong>Fecha de entrega:</strong>{" "}
-                  {nftVariables.fecha || "N/A"}
+                  {nftTPIVariables.fecha || "N/A"}
                 </p>
                 <p>
                   <strong>IDs de tokens de clases:</strong>{" "}
-                  {nftVariables.idsVerificados || "N/A"}
+                  {nftTPIVariables.idsVerificados || "N/A"}
                 </p>
               </div>
             )}

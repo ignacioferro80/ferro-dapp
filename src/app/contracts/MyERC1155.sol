@@ -18,12 +18,10 @@ contract MyERC1155 is ERC1155, Ownable {
 
     mapping(uint256 => NFTMetadata) public metadatas;
 
-    // El destinatario fijo ahora es solo uno (tu wallet)
-    address public destinatario = 0xd614A872961Aa8213283464aFb00F9bfB938d7a1;
-
     constructor() ERC1155("") Ownable(msg.sender) {}
 
     function mintNFT(
+        address _destinatario,
         string memory _nombreAlumno,
         string memory _fecha,
         string memory _idsVerificados
@@ -37,12 +35,12 @@ contract MyERC1155 is ERC1155, Ownable {
             idsVerificados: _idsVerificados
         });
 
-        _mint(destinatario, newTokenId, 1, ""); // Solo minteamos a tu wallet
+        _mint(_destinatario, newTokenId, 1, "");
     }
 
     function uri(uint256 tokenId) public view override returns (string memory) {
         return string(abi.encodePacked(
-            "ipfs://ipfs://bafkreie4xkcq4w6fdde4fvmnw2hq7q2pitclw7ccnovdzr6oig4x2gomve/", 
+            "ipfs://bafkreie4xkcq4w6fdde4fvmnw2hq7q2pitclw7ccnovdzr6oig4x2gomve/", 
             _toString(tokenId), 
             ".json"
         ));

@@ -33,7 +33,6 @@ export default function EnviarNFT() {
             nuevosIds.push(nft.id.tokenId);
           }
         }
-        console.log(nuevosIds);
         setIdsNfts((prev) => [...prev, ...nuevosIds]);
         if (nftsUNQ < 10) {
           alert("No tenés suficientes NFTs válidos para enviar");
@@ -56,12 +55,10 @@ export default function EnviarNFT() {
       alert("No se proporcionó una dirección válida.");
       route.push("/");
     }
-  }, []);
+  }, [address]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Enviando NFT:", nombreAlumno);
-    console.log("IDs de NFTs:", idsNfts);
     if (nombreAlumno.trim()) {
       const idsNaturales = idsNfts.map((id) => parseInt(id, 16));
       const stringIds = idsNaturales.join(",");
