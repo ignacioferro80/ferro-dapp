@@ -1,12 +1,9 @@
 import { ethers } from "ethers";
-import abi from "../utils/abi.json"; // Asegúrate de que la ruta sea correcta
+import abi from "../utils/abi.json";
 
-const contractAddress = "0x73f8Fb7869FC20bBC328436B9798B8EE92B19bD8";
-
-export default async function mintNFT(nombre) {
-	console.log("Minting NFT with name:", nombre);
+export default async function mintNFT(nombre, fechaString, arrayString) {
+	console.log("Minteando NFT con nombre:", nombre + ", fecha:", fechaString + ", array:", arrayString);
   try {
-    // Conectarse a MetaMask
     if (!window.ethereum) {
       alert("Necesitás MetaMask");
       return;
@@ -16,24 +13,21 @@ export default async function mintNFT(nombre) {
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
 
-    const contract = new ethers.Contract(contractAddress, abi, signer);
+    const contract = new ethers.Contract(process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS, abi, signer);
 
-    // Llamamos a mintNFT con cualquier dato simple
     const tx = await contract.mintNFT(
       `${nombre}`,
-      "10/06/2025",
-      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] // Ejemplo de array fijo
+      fechaString,
+      arrayString
     );
-
-    document.getElementById("status").innerText = "Minteando... Esperá";
 
     await tx.wait(); // Esperar confirmación
 
-    document.getElementById("status").innerText = "NFT minteado con éxito ✅";
+    console.log("NFT minteado con éxito ✅");
   } catch (err) {
     console.error(err);
 	err.stack && console.error(err.stack);
 	console.log(err.message);
-    document.getElementById("status").innerText = "Error al mintear ❌";
+    console.log("Error al mintear ❌");
   }
 };

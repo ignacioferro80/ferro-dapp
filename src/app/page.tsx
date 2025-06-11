@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ethers } from "ethers";
+import { ethers, JsonRpcProvider } from "ethers";
 import { validarNFTsUNQ } from "@/app/scripts/validarNFTsUNQ";
 import unqAbi from "@/app/utils/unqAbi.json";
+import abi from "./utils/abi.json";
 
 declare global {
   interface Window {
@@ -18,13 +19,12 @@ export default function Home() {
   const [inputAddress, setInputAddress] = useState<string>("");
   const [nfts, setNfts] = useState<any[]>([]);
   const [selectedNFT, setSelectedNFT] = useState<any | null>(null);
-  const [selectedUNQNFT, setSelectedUNQNFT] = useState<any | null>(null);
   const [nftVariables, setNftVariables] = useState<any>({});
   const [nftsValidos, setNftsValidos] = useState(false);
 
   const router = useRouter();
 
-  const provider = new ethers.providers.JsonRpcProvider(
+  const provider = new JsonRpcProvider(
     `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
   );
 
@@ -85,7 +85,8 @@ export default function Home() {
   const selectNFT = async (nft: any) => {
     setSelectedNFT(nft);
     if (
-      nft.contract.address.toLowerCase() === process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!.toLowerCase()
+      nft.contract.address.toLowerCase() ===
+      process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!.toLowerCase()
     ) {
       // Llamar al URI
       const tokenId = nft.id.tokenId;
@@ -102,8 +103,26 @@ export default function Home() {
         tema: result.tema,
         alumno: result.alumno,
       });
+    } else if (
+      nft.contract.address.toLowerCase() ===
+      process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!.toLowerCase()
+    ) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const contrato = new ethers.Contract(
+        process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!,
+        abi,
+        provider
+      );
+      const metadata = await contrato.metadatas(nft.id.tokenId);
+      console.log(nft);
 
-      setSelectedUNQNFT(nft);
+      console.log("Metadata del NFT TPI:", metadata);
+
+      setNftVariables({
+        nombre: metadata.nombreAlumno,
+        fecha: metadata.fecha,
+        idsVerificados: metadata.idsVerificados,
+      });
     }
   };
 
@@ -154,7 +173,7 @@ export default function Home() {
                 className="rounded-lg object-cover w-full h-auto"
               />
             ) : (
-              <p>Sin imagen</p>
+              <p className="text-gray-500">Sin imagen disponible</p>
             )}
             <p className="mt-2 text-sm font-medium text-center">
               {nft.title || "NFT"}
@@ -168,50 +187,46 @@ export default function Home() {
           className={`flex flex-col md:flex-row justify-center items-center
         }`}
         >
-            <button
-              className={`gap-4 mb-6 px-6 py-3 m-10 font-semibold rounded-xl shadow-md cursor-pointer
+          <button
+            className={`gap-4 mb-6 px-6 py-3 m-10 font-semibold rounded-xl shadow-md cursor-pointer
         ${
           nftsValidos
             ? "text-green-800 hover:scale-101 bg-green-100 hover:bg-green-200 transition-all duration-600"
             : "bg-gray-200 text-gray-500"
         }`}
-              disabled={!nftsValidos}
-              onClick={() => {
-                router.push(`envio-nft?address=${walletAddress}`);
-              }}
-            >
-              Enviar NFT Trabjo Práctico Integrador
-            </button>
+            disabled={!nftsValidos}
+            onClick={() => {
+              router.push(`envio-nft?address=${walletAddress}`);
+            }}
+          >
+            Enviar NFT Trabjo Práctico Integrador
+          </button>
         </div>
       )}
 
       {selectedNFT && (
         <div className="mt-10 bg-white text-black rounded-xl p-6 shadow-xl max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold mb-4 text-center">
-            {selectedNFT.title || "NFT seleccionado"}
-          </h2>
-          {selectedNFT.media?.[0]?.gateway && (
-            <Image
-              src={selectedNFT.media[0].gateway}
-              alt={selectedNFT.title}
-              width={400}
-              height={400}
-              className="rounded-xl mx-auto"
-            />
-          )}
-
           <div className="mt-4 space-y-2 text-sm">
-            <p>
-              <strong>Descripción:</strong>{" "}
-              {selectedNFT.description || "Sin descripción"}
-            </p>
-            <p>
-              <strong>Token ID:</strong>{" "}
-              {Number(selectedNFT.id?.tokenId) || "N/A"}
-            </p>
 
-            {selectedUNQNFT && (
+            {selectedNFT.contract.address.toLowerCase() ===
+              process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!.toLowerCase() && (
               <div>
+                <h2 className="text-2xl font-bold mb-4 text-center">
+                  {selectedNFT.title || "NFT seleccionado"}
+                </h2>
+                {selectedNFT.media?.[0]?.gateway && (
+                  <Image
+                    src={selectedNFT.media[0].gateway}
+                    alt={selectedNFT.title}
+                    width={400}
+                    height={400}
+                    className="rounded-xl mx-auto"
+                  />
+                )}
+                <p>
+                  <strong>Descripción:</strong>{" "}
+                  {selectedNFT.description || "Sin descripción"}
+                </p>
                 <p>
                   <strong>Clase:</strong> {nftVariables.clase || "N/A"}
                 </p>
@@ -223,12 +238,37 @@ export default function Home() {
                 </p>
               </div>
             )}
+
+            {selectedNFT.contract.address.toLowerCase() ===
+              process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!.toLowerCase() && (
+              <div>
+                <h2 className="text-2xl font-bold mb-4 text-center">
+                  {selectedNFT.contractMetadata.name || "NFT seleccionado"}
+                </h2>
+                <p>
+                  <strong>Nombre del alumno:</strong>{" "}
+                  {nftVariables.nombre || "N/A"}
+                </p>
+                <p>
+                  <strong>Fecha de entrega:</strong>{" "}
+                  {nftVariables.fecha || "N/A"}
+                </p>
+                <p>
+                  <strong>IDs de tokens de clases:</strong>{" "}
+                  {nftVariables.idsVerificados || "N/A"}
+                </p>
+              </div>
+            )}
+            <p>
+              <strong>Token ID:</strong>{" "}
+              {Number(selectedNFT.id?.tokenId) || "N/A"}
+            </p>
           </div>
 
           <div className="flex justify-center mt-6">
             <button
               onClick={() => {
-                setSelectedNFT(null), setSelectedUNQNFT(null);
+                setSelectedNFT(null);
               }}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 cursor-pointer transition-all"
             >

@@ -9,6 +9,7 @@ import mintNFT from "@/app/scripts/mintNFT";
 export default function EnviarNFT() {
   const [nombreAlumno, setNombreAlumno] = useState("");
   const [nfts, setNfts] = useState<any[]>([]);
+  const [idsNfts, setIdsNfts] = useState<string[]>([]);
   const searchParams = useSearchParams();
   const address = searchParams.get("address");
   const route = useRouter();
@@ -22,14 +23,18 @@ export default function EnviarNFT() {
       setNfts(data.ownedNfts || []);
       if (data.ownedNfts.length > 0) {
         let nftsUNQ = 0;
+        let nuevosIds: string[] = [];
         for (const nft of data.ownedNfts) {
           if (
             nft.contract.address.toLowerCase() ===
             process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!.toLowerCase()
           ) {
             nftsUNQ++;
+            nuevosIds.push(nft.id.tokenId);
           }
         }
+        console.log(nuevosIds);
+        setIdsNfts((prev) => [...prev, ...nuevosIds]);
         if (nftsUNQ < 10) {
           alert("No tenés suficientes NFTs válidos para enviar");
           route.push("/");
@@ -56,8 +61,11 @@ export default function EnviarNFT() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Enviando NFT:", nombreAlumno);
+    console.log("IDs de NFTs:", idsNfts);
     if (nombreAlumno.trim()) {
-      mintNFT(nombreAlumno);
+      const idsNaturales = idsNfts.map((id) => parseInt(id, 16));
+      const stringIds = idsNaturales.join(",");
+      mintNFT(nombreAlumno, new Date().toLocaleDateString(), stringIds);
     }
   };
 

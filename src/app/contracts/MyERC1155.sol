@@ -13,7 +13,7 @@ contract MyERC1155 is ERC1155, Ownable {
         string nombreAlumno;
         string fecha;
         address from;
-        uint256[10] idsVerificados;
+        string idsVerificados;
     }
 
     mapping(uint256 => NFTMetadata) public metadatas;
@@ -26,7 +26,7 @@ contract MyERC1155 is ERC1155, Ownable {
     function mintNFT(
         string memory _nombreAlumno,
         string memory _fecha,
-        uint256[10] memory _idsVerificados
+        string memory _idsVerificados
     ) public {
         uint256 newTokenId = ++currentTokenId;
 
@@ -42,7 +42,7 @@ contract MyERC1155 is ERC1155, Ownable {
 
     function uri(uint256 tokenId) public view override returns (string memory) {
         return string(abi.encodePacked(
-            "ipfs://tpi-metadata/", 
+            "ipfs://ipfs://bafkreie4xkcq4w6fdde4fvmnw2hq7q2pitclw7ccnovdzr6oig4x2gomve/", 
             _toString(tokenId), 
             ".json"
         ));
