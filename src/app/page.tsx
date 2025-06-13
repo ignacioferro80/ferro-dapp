@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ethers, JsonRpcProvider } from "ethers";
 import { validarNFTsUNQ } from "@/app/scripts/validarNFTsUNQ";
+import { validarNFTTPI } from "@/app/scripts/validarNFTTPI";
 import unqAbi from "@/app/utils/unqAbi.json";
 import abi from "./utils/abi.json";
 
@@ -22,6 +23,7 @@ export default function Home() {
   const [nftUNQVariables, setNftUNQVariables] = useState<any>({});
   const [nftTPIVariables, setNftTPIVariables] = useState<any>({});
   const [nftsValidos, setNftsValidos] = useState(false);
+  const [promocionValida, setPromocionValida] = useState(false);
 
   const router = useRouter();
 
@@ -40,6 +42,8 @@ export default function Home() {
       (async () => {
         const validos = await validarNFTsUNQ(walletAddress);
         setNftsValidos(validos);
+        const promocionValida = await validarNFTTPI(walletAddress);
+        setPromocionValida(promocionValida);
       })();
     }
   }, [walletAddress]);
@@ -222,6 +226,21 @@ export default function Home() {
           >
             Enviar NFT Trabjo Práctico Integrador
           </button>
+
+            <button
+            className={`gap-4 mb-6 px-6 py-3 m-10 font-semibold rounded-xl shadow-md cursor-pointer
+        ${
+          promocionValida
+            ? "text-green-800 hover:scale-101 bg-green-100 hover:bg-green-200 transition-all duration-600"
+            : "bg-gray-200 text-gray-500"
+        }`}
+            disabled={!promocionValida}
+            onClick={() => {
+            }}
+          >
+            Enviar NFT Promoción
+          </button>
+
         </div>
       )}
 
@@ -229,7 +248,7 @@ export default function Home() {
         <div className="mt-10 bg-white text-black rounded-xl p-6 shadow-xl max-w-3xl mx-auto">
           <div className="mt-4 space-y-2 text-sm">
             {selectedNFT.contract.address.toLowerCase() ===
-              process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!.toLowerCase() && (
+              process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!.toLowerCase() ? (
               <div>
                 <h2 className="text-2xl font-bold mb-4 text-center">
                   {selectedNFT.title || "NFT seleccionado"}
@@ -257,10 +276,8 @@ export default function Home() {
                   <strong>Alumno:</strong> {nftUNQVariables.alumno || "N/A"}
                 </p>
               </div>
-            )}
-
-            {selectedNFT.contract.address.toLowerCase() ===
-              process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!.toLowerCase() && (
+            ) : (selectedNFT.contract.address.toLowerCase() ===
+              process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!.toLowerCase() ? (
               <div>
                 <h2 className="text-2xl font-bold mb-4 text-center">
                   {selectedNFT.contractMetadata.name || "NFT seleccionado"}
@@ -285,11 +302,17 @@ export default function Home() {
                   {nftTPIVariables.idsVerificados || "N/A"}
                 </p>
               </div>
-            )}
+            ) : (
+              <div>
+            <h2 className="text-2xl font-bold mb-4 text-center">
+                  {selectedNFT.title || "NFT seleccionado"}
+                </h2>
             <p>
               <strong>Token ID:</strong>{" "}
               {Number(selectedNFT.id?.tokenId) || "N/A"}
             </p>
+          </div>
+            ))}
           </div>
 
           <div className="flex justify-center mt-6">
