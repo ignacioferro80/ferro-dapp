@@ -1,6 +1,6 @@
 'use client';
-import EnviarNFT from '@/paginas/EnviarNFT';
+import EnviarNFTTPI from '@/paginas/EnviarNFTTPI';
 
 export default function Page() {
-  return <EnviarNFT />;
+  return <EnviarNFTTPI />;
 }

@@ -97,7 +97,6 @@ export const validarNFTsUNQ = async (address: string): Promise<boolean> => {
     if (validNfts.length === 10) {
       return true;
     } else {
-      console.log(`❌ NO cumple con los requisitos (${validNfts.length}/10).`);
       return false;
     }
   } catch (err) {

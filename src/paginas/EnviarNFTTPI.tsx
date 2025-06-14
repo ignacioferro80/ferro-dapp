@@ -4,9 +4,9 @@ import React, { useState, useEffect } from "react";
 import ferrotoken from "@/app/assets/ferrotoken.png";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import mintNFT from "@/app/scripts/mintNFT";
+import mintNFT from "@/app/scripts/mintNFTTPI";
 
-export default function EnviarNFT() {
+export default function EnviarNFTTPI() {
   const [nombreAlumno, setNombreAlumno] = useState("");
   const [nfts, setNfts] = useState<any[]>([]);
   const [idsNfts, setIdsNfts] = useState<string[]>([]);

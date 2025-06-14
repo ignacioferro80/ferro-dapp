@@ -5,9 +5,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ethers, JsonRpcProvider } from "ethers";
 import { validarNFTsUNQ } from "@/app/scripts/validarNFTsUNQ";
-import { validarNFTTPI } from "@/app/scripts/validarNFTTPI";
 import unqAbi from "@/app/utils/unqAbi.json";
-import abi from "./utils/abi.json";
+import tpiAbi from "./utils/tpiAbi.json";
+import promocionAbi from "./utils/promocionAbi.json";
 
 declare global {
   interface Window {
@@ -22,8 +22,8 @@ export default function Home() {
   const [selectedNFT, setSelectedNFT] = useState<any | null>(null);
   const [nftUNQVariables, setNftUNQVariables] = useState<any>({});
   const [nftTPIVariables, setNftTPIVariables] = useState<any>({});
+  const [nftPromocionVariables, setNftPromocionVariables] = useState<any>({});
   const [nftsValidos, setNftsValidos] = useState(false);
-  const [promocionValida, setPromocionValida] = useState(false);
 
   const router = useRouter();
 
@@ -40,10 +40,10 @@ export default function Home() {
   useEffect(() => {
     if (walletAddress && window.ethereum) {
       (async () => {
+        setInputAddress(walletAddress);
+        fetchNFTs(walletAddress);
         const validos = await validarNFTsUNQ(walletAddress);
         setNftsValidos(validos);
-        const promocionValida = await validarNFTTPI(walletAddress);
-        setPromocionValida(promocionValida);
       })();
     }
   }, [walletAddress]);
@@ -56,8 +56,6 @@ export default function Home() {
         });
         const account = accounts[0];
         setWalletAddress(account);
-        setInputAddress(account);
-        fetchNFTs(account);
       } catch (err) {
         console.error("Error al conectar con MetaMask:", err);
       }
@@ -80,7 +78,7 @@ export default function Home() {
           const provider = new ethers.BrowserProvider(window.ethereum);
           const contrato = new ethers.Contract(
             process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!,
-            abi,
+            tpiAbi,
             provider
           );
 
@@ -92,9 +90,28 @@ export default function Home() {
 
           nft.media = [{ gateway: imageUrl }];
           nft.title = "NFT TPI";
+        } else if (
+          nft.contract.address.toLowerCase() ===
+          process.env.NEXT_PUBLIC_NFT_PROMOCION_CONTRACT_ADDRESS!.toLowerCase()
+        ) {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const contrato = new ethers.Contract(
+            process.env.NEXT_PUBLIC_NFT_PROMOCION_CONTRACT_ADDRESS!,
+            promocionAbi,
+            provider
+          );
+
+          const tokenId = nft.id.tokenId;
+
+          let uri = await contrato.uri(tokenId);
+          let uriHttp = uri.replace("ipfs://", "https://ipfs.io/ipfs/");
+          const imageUrl = uriHttp.replace(/\/[^/]+\.json$/, "/");
+
+          nft.media = [{ gateway: imageUrl }];
+          nft.title = "NFT Promoción";
         }
-        setNfts(data.ownedNfts || []);
       }
+      setNfts(data.ownedNfts || []);
     } catch (err) {
       console.error("Error al obtener NFTs:", err);
     }
@@ -102,7 +119,7 @@ export default function Home() {
 
   const handleSearch = () => {
     try {
-      fetchNFTs(inputAddress);
+      setWalletAddress(inputAddress);
     } catch (err) {
       console.error("Error al buscar NFTs:", err);
     }
@@ -136,7 +153,7 @@ export default function Home() {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const contrato = new ethers.Contract(
         process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!,
-        abi,
+        tpiAbi,
         provider
       );
 
@@ -147,6 +164,25 @@ export default function Home() {
         nombre: metadata.nombreAlumno,
         fecha: metadata.fecha,
         idsVerificados: metadata.idsVerificados,
+      });
+    } else if (
+      nft.contract.address.toLowerCase() ===
+      process.env.NEXT_PUBLIC_NFT_PROMOCION_CONTRACT_ADDRESS!.toLowerCase()
+    ) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const contrato = new ethers.Contract(
+        process.env.NEXT_PUBLIC_NFT_PROMOCION_CONTRACT_ADDRESS!,
+        promocionAbi,
+        provider
+      );
+
+      const tokenId = nft.id.tokenId;
+      const metadata = await contrato.metadatas(tokenId);
+
+      setNftPromocionVariables({
+        nombre: metadata.nombre,
+        fecha: metadata.fecha,
+        descripcion: metadata.descripcion,
       });
     }
   };
@@ -195,7 +231,7 @@ export default function Home() {
                 alt={nft.title || "NFT"}
                 width={300}
                 height={300}
-                className="rounded-lg object-cover w-full h-auto"
+                className="rounded-lg object-cover w-full h-auto mx-auto"
               />
             ) : (
               <p className="text-gray-500">Sin imagen disponible</p>
@@ -213,7 +249,7 @@ export default function Home() {
         }`}
         >
           <button
-            className={`gap-4 mb-6 px-6 py-3 m-10 font-semibold rounded-xl shadow-md cursor-pointer
+            className={`w-70 gap-4 mb-6 px-6 py-3 m-10 font-semibold rounded-xl shadow-md cursor-pointer
         ${
           nftsValidos
             ? "text-green-800 hover:scale-101 bg-green-100 hover:bg-green-200 transition-all duration-600"
@@ -224,23 +260,17 @@ export default function Home() {
               router.push(`envio-nft?address=${walletAddress}`);
             }}
           >
-            Enviar NFT Trabjo Práctico Integrador
+            Enviar NFT TP Integrador
           </button>
 
-            <button
-            className={`gap-4 mb-6 px-6 py-3 m-10 font-semibold rounded-xl shadow-md cursor-pointer
-        ${
-          promocionValida
-            ? "text-green-800 hover:scale-101 bg-green-100 hover:bg-green-200 transition-all duration-600"
-            : "bg-gray-200 text-gray-500"
-        }`}
-            disabled={!promocionValida}
+          <button
+            className={`w-70 gap-4 mb-6 px-6 py-3 m-10 font-semibold rounded-xl shadow-md cursor-pointer text-white hover:scale-101 bg-violet-500 hover:bg-violet-400 transition-all duration-600`}
             onClick={() => {
+              router.push(`envio-nft-promocion?address=${walletAddress}`);
             }}
           >
             Enviar NFT Promoción
           </button>
-
         </div>
       )}
 
@@ -248,7 +278,7 @@ export default function Home() {
         <div className="mt-10 bg-white text-black rounded-xl p-6 shadow-xl max-w-3xl mx-auto">
           <div className="mt-4 space-y-2 text-sm">
             {selectedNFT.contract.address.toLowerCase() ===
-              process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!.toLowerCase() ? (
+            process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!.toLowerCase() ? (
               <div>
                 <h2 className="text-2xl font-bold mb-4 text-center">
                   {selectedNFT.title || "NFT seleccionado"}
@@ -276,19 +306,19 @@ export default function Home() {
                   <strong>Alumno:</strong> {nftUNQVariables.alumno || "N/A"}
                 </p>
               </div>
-            ) : (selectedNFT.contract.address.toLowerCase() ===
+            ) : selectedNFT.contract.address.toLowerCase() ===
               process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!.toLowerCase() ? (
               <div>
                 <h2 className="text-2xl font-bold mb-4 text-center">
                   {selectedNFT.contractMetadata.name || "NFT seleccionado"}
                 </h2>
                 <Image
-                    src={selectedNFT.media[0].gateway}
-                    alt={"NFT TPI"}
-                    width={400}
-                    height={400}
-                    className="rounded-xl mx-auto"
-                  />
+                  src={selectedNFT.media[0].gateway}
+                  alt={"NFT TPI"}
+                  width={400}
+                  height={400}
+                  className="rounded-xl mx-auto"
+                />
                 <p>
                   <strong>Nombre del alumno:</strong>{" "}
                   {nftTPIVariables.nombre || "N/A"}
@@ -302,17 +332,43 @@ export default function Home() {
                   {nftTPIVariables.idsVerificados || "N/A"}
                 </p>
               </div>
-            ) : (
+            ) : selectedNFT.contract.address.toLowerCase() ===
+              process.env.NEXT_PUBLIC_NFT_PROMOCION_CONTRACT_ADDRESS!.toLowerCase() ? (
               <div>
-            <h2 className="text-2xl font-bold mb-4 text-center">
+                <h2 className="text-2xl font-bold mb-4 text-center">
                   {selectedNFT.title || "NFT seleccionado"}
                 </h2>
-            <p>
-              <strong>Token ID:</strong>{" "}
-              {Number(selectedNFT.id?.tokenId) || "N/A"}
-            </p>
-          </div>
-            ))}
+                <Image
+                  src={selectedNFT.media[0].gateway}
+                  alt={"NFT Promoción"}
+                  width={400}
+                  height={400}
+                  className="rounded-xl mx-auto"
+                />
+                <p>
+                  <strong>Nombre del alumno:</strong>{" "}
+                  {nftPromocionVariables.nombre || "N/A"}
+                </p>
+                <p>
+                  <strong>Fecha de emisión:</strong>{" "}
+                  {nftPromocionVariables.fecha || "N/A"}
+                </p>
+                <p>
+                  <strong>Descripción:</strong>{" "}
+                  {nftPromocionVariables.descripcion || "N/A"}
+                </p>
+              </div>
+            ) : (
+              <div>
+                <h2 className="text-2xl font-bold mb-4 text-center">
+                  {selectedNFT.title || "NFT seleccionado"}
+                </h2>
+                <p>
+                  <strong>Token ID:</strong>{" "}
+                  {Number(selectedNFT.id?.tokenId) || "N/A"}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-center mt-6">
