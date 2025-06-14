@@ -9,10 +9,15 @@ export default async function mintNFT(nombre, fechaString, arrayString) {
     }
 
     await ethereum.request({ method: "eth_requestAccounts" });
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    const contract = new ethers.Contract(process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS, tpiAbi, signer);
+    const signer = provider.getSigner();
+
+    const contract = new ethers.Contract(
+      process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS,
+      tpiAbi,
+      signer
+    );
 
     const addressPablo = "0x96664195a728321F0F672B3BA29639eD727CE7a1";
     const addressDaniel = "0x81Bce31CaB4F37DdC8561550Ee7eaa859ca50581";
@@ -39,12 +44,10 @@ export default async function mintNFT(nombre, fechaString, arrayString) {
     await tx2.wait();
 
     alert("NFTs minteados con éxito ✅");
-
-
   } catch (err) {
     console.error(err);
-	err.stack && console.error(err.stack);
-	console.log(err.message);
+    err.stack && console.error(err.stack);
+    console.log(err.message);
     console.log("Error al mintear ❌");
   }
-};
+}
