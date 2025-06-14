@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ethers, JsonRpcProvider } from "ethers";
+import { ethers } from "ethers";
 import { validarNFTsUNQ } from "@/app/scripts/validarNFTsUNQ";
 import unqAbi from "@/app/utils/unqAbi.json";
 import tpiAbi from "./utils/tpiAbi.json";
@@ -27,10 +27,9 @@ export default function Home() {
 
   const router = useRouter();
 
-  const provider = new JsonRpcProvider(
+  const provider = new ethers.providers.JsonRpcProvider(
     `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
   );
-
   const unqContract = new ethers.Contract(
     process.env.NEXT_PUBLIC_UNQ_CONTRACT_ADDRESS!,
     unqAbi,
@@ -75,7 +74,7 @@ export default function Home() {
           nft.contract.address.toLowerCase() ===
           process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!.toLowerCase()
         ) {
-          const provider = new ethers.BrowserProvider(window.ethereum);
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
           const contrato = new ethers.Contract(
             process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!,
             tpiAbi,
@@ -94,7 +93,7 @@ export default function Home() {
           nft.contract.address.toLowerCase() ===
           process.env.NEXT_PUBLIC_NFT_PROMOCION_CONTRACT_ADDRESS!.toLowerCase()
         ) {
-          const provider = new ethers.BrowserProvider(window.ethereum);
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
           const contrato = new ethers.Contract(
             process.env.NEXT_PUBLIC_NFT_PROMOCION_CONTRACT_ADDRESS!,
             promocionAbi,
@@ -150,7 +149,7 @@ export default function Home() {
       nft.contract.address.toLowerCase() ===
       process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!.toLowerCase()
     ) {
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       const contrato = new ethers.Contract(
         process.env.NEXT_PUBLIC_NFT_TPI_CONTRACT_ADDRESS!,
         tpiAbi,
@@ -169,7 +168,7 @@ export default function Home() {
       nft.contract.address.toLowerCase() ===
       process.env.NEXT_PUBLIC_NFT_PROMOCION_CONTRACT_ADDRESS!.toLowerCase()
     ) {
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       const contrato = new ethers.Contract(
         process.env.NEXT_PUBLIC_NFT_PROMOCION_CONTRACT_ADDRESS!,
         promocionAbi,
