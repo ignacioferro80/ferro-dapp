@@ -9,8 +9,8 @@ export default async function mintNFT(nombre, fechaString, descripcion) {
     }
 
     await ethereum.request({ method: "eth_requestAccounts" });
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
 
     const contract = new ethers.Contract(process.env.NEXT_PUBLIC_NFT_PROMOCION_CONTRACT_ADDRESS, promocionAbi, signer);
 
