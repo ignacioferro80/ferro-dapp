@@ -12,7 +12,7 @@ export default function EnviarNFTTPI() {
   const [idsNfts, setIdsNfts] = useState<string[]>([]);
   const searchParams = useSearchParams();
   const address = searchParams.get("address");
-  const route = useRouter();
+  const router = useRouter();
 
   const checkNFTsValidos = async (address: string) => {
     try {
@@ -36,15 +36,15 @@ export default function EnviarNFTTPI() {
         setIdsNfts((prev) => [...prev, ...nuevosIds]);
         if (nftsUNQ < 10) {
           alert("No tenés suficientes NFTs válidos para enviar");
-          route.push("/");
+          router.push("/");
         }
       } else {
         alert("No se encontraron NFTs para el usuario");
-        route.push("/");
+        router.push("/");
       }
     } catch (err) {
       alert("La dirección ingresada no es válida o no tiene NFTs asociados.");
-      route.push("/");
+      router.push("/");
     }
   };
 
@@ -53,7 +53,7 @@ export default function EnviarNFTTPI() {
       checkNFTsValidos(address);
     } else {
       alert("No se proporcionó una dirección válida.");
-      route.push("/");
+      router.push("/");
     }
   }, [address]);
 
@@ -68,6 +68,12 @@ export default function EnviarNFTTPI() {
 
   return (
     <main className="min-h-screen px-6 py-10 bg-gradient-to-br from-blue-600 to-purple-900 text-white">
+      <button
+        onClick={() => router.push("/")}
+        className="absolute top-6 left-6 bg-gray-300 hover:bg-gray-300 cursor-pointer text-black  py-1 px-4 rounded shadow transition hover:scale-102 duration-300 tracking-widest"
+      >
+        Volver
+      </button>
       <div className="bg-white shadow-xl rounded-2xl p-6 max-w-md mx-auto mt-10 relative">
         {/* Imagen */}
         <img

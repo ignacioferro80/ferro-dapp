@@ -14,6 +14,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Buscador de NFTs",
+  icons: {
+    icon: "/lupa.png",
+  },
 };
 
 export default function RootLayout({
