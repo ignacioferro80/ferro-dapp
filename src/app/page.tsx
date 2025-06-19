@@ -86,6 +86,9 @@ export default function Home() {
           let uri = await contrato.uri(tokenId);
           let uriHttp = uri.replace("ipfs://", "https://ipfs.io/ipfs/");
           const imageUrl = uriHttp.replace(/\/[^/]+\.json$/, "/");
+          console.log(tokenId)
+          console.log("Image URL:", uri);
+          console.log(imageUrl);
 
           nft.media = [{ gateway: imageUrl }];
           nft.title = "NFT TPI";
