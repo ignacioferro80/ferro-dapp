@@ -10,7 +10,7 @@ const nextConfig = {
         pathname: "/ipfs/**",
       },
     ],
-    domains: ['v0-host-image-on-vercel.vercel.app', 'ipfs.io'],
+    domains: ['v0-host-image-on-vercel.vercel.app', 'ipfs.io', 'nftstorage.link'],
   },
 };
 

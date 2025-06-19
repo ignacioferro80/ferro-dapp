@@ -84,7 +84,7 @@ export default function Home() {
           const tokenId = nft.id.tokenId;
 
           let uri = await contrato.uri(tokenId);
-          let uriHttp = uri.replace("ipfs://", "https://ipfs.io/ipfs/");
+          let uriHttp = uri.replace("ipfs://", "https://nftstorage.link/ipfs/");
           const imageUrl = uriHttp.replace(/\/[^/]+\.json$/, "/");
           console.log(tokenId)
           console.log("Image URL:", uri);
@@ -106,7 +106,7 @@ export default function Home() {
           const tokenId = nft.id.tokenId;
 
           let uri = await contrato.uri(tokenId);
-          let uriHttp = uri.replace("ipfs://", "https://ipfs.io/ipfs/");
+          let uriHttp = uri.replace("ipfs://", "https://nftstorage.link/ipfs/");
           const imageUrl = uriHttp.replace(/\/[^/]+\.json$/, "/");
 
           console.log(tokenId)
@@ -232,7 +232,7 @@ export default function Home() {
             className="cursor-pointer bg-white text-black rounded-xl p-4 shadow-lg hover:scale-102 transition-transform duration-300"
           >
             {nft.media && nft.media[0]?.gateway ? (
-              <Image
+              <img
                 src={nft.media[0].gateway}
                 alt={nft.title || "NFT"}
                 width={300}
@@ -290,7 +290,7 @@ export default function Home() {
                   {selectedNFT.title || "NFT seleccionado"}
                 </h2>
                 {selectedNFT.media?.[0]?.gateway && (
-                  <Image
+                  <img
                     src={selectedNFT.media[0].gateway}
                     alt={selectedNFT.title}
                     width={400}
@@ -318,7 +318,7 @@ export default function Home() {
                 <h2 className="text-2xl font-bold mb-4 text-center">
                   {selectedNFT.contractMetadata.name || "NFT seleccionado"}
                 </h2>
-                <Image
+                <img
                   src={selectedNFT.media[0].gateway}
                   alt={"NFT TPI"}
                   width={400}
@@ -344,7 +344,7 @@ export default function Home() {
                 <h2 className="text-2xl font-bold mb-4 text-center">
                   {selectedNFT.title || "NFT seleccionado"}
                 </h2>
-                <Image
+                <img
                   src={selectedNFT.media[0].gateway}
                   alt={"NFT Promoción"}
                   width={400}
