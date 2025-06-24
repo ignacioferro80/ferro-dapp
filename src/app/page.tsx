@@ -285,7 +285,7 @@ export default function Home() {
             }}
           >
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-800 font-semibold">
-              ⭐ Enviar NFT TPI Promoción
+              ⭐ Enviar NFT Promoción
             </span>
           </button>
         </div>
