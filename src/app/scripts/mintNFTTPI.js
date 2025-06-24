@@ -26,7 +26,7 @@ export default async function mintNFT(nombre, fechaString, arrayString) {
     const addressJoaco = "0xb3e143114D4de641A66C7df96B358E7944090628";
 
     const tx = await contract.mintNFT(
-      addressGuido,
+      addressPablo,
       `${nombre}`,
       fechaString,
       arrayString
@@ -35,7 +35,7 @@ export default async function mintNFT(nombre, fechaString, arrayString) {
     await tx.wait();
 
     const tx2 = await contract.mintNFT(
-      addressJoaco,
+      addressDaniel,
       `${nombre}`,
       fechaString,
       arrayString
