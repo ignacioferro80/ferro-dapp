@@ -1,174 +1,124 @@
-# Anotaciones - TRABAJO FINAL - dApp funcional
+# 🎓 Proyecto TPI - Tokens NFT en Blockchain
 
-### FLUJO 1:
+## Ignacio Ferro - Introducción a Blockchain - 2025s1
 
-#### Home page:
-- La wallet del cliente se conecta a la dApp
-- Se listan todos sus NFTs tipo ERC-1155 que holdea
-- Se podrán visualizar esos NFTs en detalle y sus variables de entorno (como hace la página actualmente)
-- Debajo de la página habrá un botón que diga "Generar NFT de TP final PRUEBA"
+---
 
-Validaciones necesarias:
-- _a. Verificar que sean 10 NFTs distintos:_ 
-  - Usar ID/tokenURI o metadata.
-- _b. Validar que fueron emitidos antes del 28/05/25_:
-  - Acceder a la fecha de minteo: normalmente no está en el NFT directamente, pero se puede obtener:
-    - Con historial de eventos del contrato (mint) vía Alchemy o Etherscan.
-    - O si vos minteás con una fecha como atributo del metadata en el pasado.
-- _c. Verificar que no fueron transferidos:_
-  - Requiere consultar el historial de transferencias por token ID.
-  - Alchemy o Etherscan API → buscar si el token ID tuvo más de una transferencia (de la address del contrato a otra = mint, de ahí en adelante = retransferencia).
+Este proyecto tiene como objetivo diseñar y desarrollar una aplicación descentralizada (dApp) que permita a los usuarios obtener, visualizar e interactuar con **NFTs académicos** obtenidos por cumplir con condiciones específicas en la materia.
 
-  🔧 Pseudocódigo resumido – tareas críticas
+---
 
-🟥 PSEUDOCÓDIGO: Validar si el usuario tiene los 10 NFTs de UNQ, emitidos antes del 28/05/25, sin transferencias
+## 🛠️ Stack Tecnológico
 
-Para cada NFT en wallet del usuario {
+|      Herramienta        | Uso |
+|-------------------------|-----|
+| **Solidity**            | Contratos inteligentes (ERC-1155) |
+| **Hardhat**             | Testing y despliegue |
+| **IPFS (NFT.Storage)**  | Almacenamiento de metadata e imágenes |
+| **Next.js**             | Frontend web (React) |
+| **Alchemy**             | Infraestructura blockchain (API de NFTs) |
+| **Ethers.js**           | Interacción con contratos desde el frontend |
 
-- if token.contractAddress == dirección del contrato de UNQ:
+---
 
-  - fetch metadata del token (puede incluir tema)
+## 🧠 FLUJO 1. NFT TPI
 
-  - fetch eventos de Transfer del token ID usando Etherscan o Alchemy
+#### 🏠 Home Page:
 
-    - si hay solo un evento (mint) → ok
+La wallet del usuario se conecta automáticamente a la dApp.
 
-    - si hay más de uno → fue transferido → descartar
+Se listan todos los NFTs ERC-1155 que el usuario posee.
 
-  - fetch fecha del evento de mint (timestamp del bloque)
+#### ✅ Validaciones para activar el botón "Enviar NFT TPI":
 
-    - if timestamp < 28/05/2025 → ok
+El botón inferior de la página está habilitado solo si se cumplen las siguientes condiciones:
 
-    - else → descartar
+- El usuario posee **10 NFTs diferentes** representando cursadas de la materia.
 
-if cantidad de NFTs válidos == 10:
-→ mostrar botón de “Generar NFT TP FINAL PRUEBA”
-else:
-→ mostrar botón deshabilitado con opacidad
+- Dichos NFTs fueron emitidos **antes del 28/05/2025** (fecha de la última clase antes del TPI).
 
-}
+- Los NFTs **no fueron transferidos**.
 
-Si todas las condiciones se cumplen:
-El botón “Generar NFT de TP final PRUEBA” se habilita visualmente (activo y sin opacidad).
+##### ✅ Lógica de validación:
 
-#### Botón generación NFT:
+Para esta validación se optó por realizar una consulta a la API de **Alchemy** creada especificamente para este proyecto, en donde se pueden realizar consultar pasando como parámetro una wallet.
+La consulta que se reliza para obtener los datos de todas las transferencias de una wallet es la siguiente:
+`https://eth-sepolia.g.alchemy.com/nft/v2/${ALCHEMY_API_KEY}/getNFTs?owner=${address}`
+Donde **ALCHEMY_API_KEY** es la clave privada del proyecto alchemy creado.
+
+De esta forma obtenemos los NFTs _"holdeados"_ por la wallet **address**, y asi por cada NFT hacer la segunda consulta de tipo `POST https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`, donde pasamos como parámetros los datos de los NFT de la UNQ, los cuales son:
+`params: [
+    {
+      fromBlock: "0x0",
+      toBlock: "latest",
+      toAddress: address,
+      contractAddresses: [UNQ_CONTRACT_ADDRESS],
+      category: ["erc1155"],
+      withMetadata: true,
+      excludeZeroValue: false,
+    },
+]`
+Asi es como obtenemos los datos de transferencia de cada NFT, para verificar que sea **"TransferSingle"** y que haya sido minteado antes de **"1748380800"**, el cual es valor en digitos para la fecha "28/05/25"
+
+#### 🖱 Interacción del Usuario:
+
 - Si se cumplen las condiciones, el cliente podrá clickear el botón para generar ese NFT ya que cuenta con los criterios para aprobar la materia.
 - Si no se cumplen, el cliente no podrá clickearlo y se verá con opacidad baja.
-- Con el clickeo del botón, se generará un formulario para completar los datos del NFT a enviar.
 
-- Los datos que tendrá el NFT serán:
-  - Nombre cliente _(META DATA)_ → Input del cliente
-  - Fecha _(VARIABLE INTERNA)_ → autogenerada en el momento de la creación del NFT.
-  - Adress _(VARIABLE INTERNA)_  → se usa la que se conectó con la wallet
-  - Titulo: NFT TP FINAL PRUEBA _(META DATA)_
-  - Datos de los 10 NFTs (Tema y ID de cada NFT) _(META DATA)_ → se extraen de los 10 NFTs validados.
-  - Imágen: Logo ferrocarril oeste _(META DATA)_
-- Habrá finalmente un boton de enviar para enviar el NFT creado
-Al presionar el botón de “Enviar”:
+_💡 Sugerencia!: Hacer la validación **en el mismo contrato** de minteo del NFT TPI. Es mucho **más facil** acceder a la wallet del cliente mediante el "minteo" de un NFT antes que hacer consultas a una API directamente desde el apartado **Front** de la dApp_
 
-### Se ejecuta la lógica para mintear el nuevo NFT con los metadatos definidos
+### 📝 Página de Mint del NFT TPI
 
-#### _Solución técnica:_
+- Con el clickeo del botón, se **redireccionará** al cliente a una nueva página para generar un **NFT del TPI**.
+- La página contiene un formulario con un solo campo, donde se le pide el nombre al alumno que busca **entregar** su NFT y un botón para **mintear** el mismo.
+- Al clickear el botón, se continuará la transferencia en la pestaña 🦊 **Metamask** del cliente y así enviar el NFT TPI a los profesores de la materia.
 
-- Crear un contrato con función de mint que permita emitir NFTs desde frontend.
+_💡 Bonus: Esta página contiene la misma validación de NFTs que se realiza en la Home page, y se ejecuta obteniendo la dirección de la wallet del cliente obtenida en el "path" de la URL. Por lo tanto, si un usuario sin NFTs válidos de la UNQ, fuerza la URL introduciendo su wallet en la misma, será automáticamente redirigido a la Home page_
 
-- Conexión del frontend a contrato: usar ethers.js
-_Ethers.js: "Te permite conectar la wallet del usuario (MetaMask) y llamar funciones del contrato desde el frontend"._
+- 🧾 Los datos que contiene el NFT TPI minteado son:
+  - **Titulo**: NFT TPI _(META DATA)_
+  - **Imágen**: _(META DATA)_
+  - **Nombre**: _(VARIABLE INTERNA)_ → Input del cliente
+  - **Fecha**: _(VARIABLE INTERNA)_ → autogenerada en el momento de la creación del NFT.
+  - **IDs de los 10 NFTs**: _(VARIABLE INTERNA)_ → se extraen de los 10 NFTs validados.
 
+### 🔍 _Solución técnica:_
 
-Los NFTs “nuevos” a crear no implican desplegar nuevos contratos cada vez. Lo que se hace es:
+- Desde el **frontend** (con ethers.js), se llama a la función **mintNFTPI()** que recibe los parametros:
+- `nombre` → Input del alumno que minteo el NFT
+- `fechaString` → Fecha actual pasado a string para pasar al contrato
+- `arrayString` → El array con los IDs de los NFTs de la materia hecho string
 
-- Usar un contrato ERC-1155 ya desplegado que soporte minting
+La función **mintNFTPI()** contiene el **_ABI_** del contrato que mintea el NFT, e importa **ethers** para asi junto con el ABI y el provider de ethers obtener el contrato para mintear el NFT ejecutando la función mintNFT() dentro del mismo.
 
-- Desde el frontend (con ethers.js), llamar a la función mint() o mintBatch() del contrato
+## 🧠 FLUJO 2. NFT Promoción
+Desde la **Home page** se puede visualizar un segundo botón para generar un **NFT de promoción**.
 
-- Pasar los parámetros del NFT: to, tokenId, cantidad, y el URI con la metadata
+### 🎓 Validación desde el contrato
+A diferencia del flujo anterior, en este caso la validación ocurre **dentro del contrato**, que verifica que la wallet del usuario sea **owner** de un NFT TPI, lo cual prueba que el cliente **recibió** el NFT del trabajo integrador.
 
+### 📝 Página de Mint de NFT Promoción
+Al **clickear** el botón, el cliente es redirigido a una página similar a la del flujo 1, donde es capaz de **mintear** un NFT para promocionar a un alumno en particular. 
 
-🟥 PSEUDOCÓDIGO: Minteo de un NFT desde la página con ethers.js
+La página cuenta con un formulario con **dos** campos: El **nombre** del alumno a promocionar y una **descripción** para informar sobre la cursada o dejar un mensaje de aprobación.
 
-{
-  conectar con MetaMask:
-  const provider = new ethers.providers.Web3Provider(window.ethereum)
-  const signer = provider.getSigner()
+🧾 Los datos que contiene el NFT Promocion son:
+  - **Título**: _(META DATA)_
+  - **Imágen**: _(META DATA)_
+  - **Nombre**: _(VARIABLE INTERNA)_ → Input del cliente que promociona escribiendo el nombre del alumno
+  - **Descripción**: _(VARIABLE INTERNA)_ → Input desarrollar por el cliente que lo genera
 
-  definir instancia del contrato:
-  const contract = new ethers.Contract(contractAddress, contractABI, signer)
+### 🔍 _Soluciones técnicas_:
 
-  armar metadata del NFT (título, ID previos, imagen...):
-  const metadata = {
-    name: "TP FINAL PRUEBA",
-    attributes: [...],
-    image: "ipfs://...",
-  }
+- **Reutilizar** el contrato del paso anterior.
+El contrato del minteo de este NFT está inspirado en el contrato del NFT TPI, pero con el extra de **validar** en el mismo minteo que la wallet ingresada es **holder** del NFT TPI para proceder con el minteo. La decision de validar de esta forma fue aprendida por el **gran esfuerzo** que tomó realizar validaciones en el mismo Front-End de la página web.
 
-  subir metadata a IPFS (opcional):
-  const metadataURI = await subirAIPFS(metadata)
+- La página funciona de la misma manera que la página del flujo 1. Se llama a una función `mintNFTPromocion` La cual pasa como parámetros `nombre`, `fechaString` y `descripción`. 
 
-  llamar a función mint del contrato:
-  await contract.mint(toAddress, tokenId, amount, metadataURI)
-}
+- La función utiliza el **ABI** del NFT Promocion y el `provider` de **ethers** para llamar al contrato del NFT y asi **validar y mintear** el NFT al alumno.
 
-- El NFT se emite directamente a la wallet address del usuario conectado (caso de prueba).
-  - _Luego se modificará esto para que se le envie el NFT a quien defina el desarrollado_
+_Importante: El contrato del NFT tiene una práctica no recomendable, la cual es introducir la wallet a mintear en el mismo contrato. ¿Qué es lo más recomendable? Incluir un parámetro extra como se realiza en el flujo 1 para introducir la dirección a la que se busca mintear._
 
-Se podría guardar un registro interno si fuese necesario (off-chain o en una base).
-#
-### FLUJO 2:
-- Solo los holders de ese NFT creado y enviado en el FLUJO 1 van a visualizar con opacidad y podrán presionar el botón "Promocionar"
-  - _Esto se hace filtrando los NFTs actuales con ese título o id_
+## 🎉 Resultado final:
 
-🟥 PSEUDOCÓDIGO: Verificar si el usuario posee el NFT TP FINAL PRUEBA (para habilitar botón Promocionar)
-
-{
-  conectar wallet y obtener address
-
-  llamar a contract.balanceOf(address, idTPFinal)
-
-  if balance > 0:
-  → mostrar botón "Promocionar"
-  else:
-  → ocultar o deshabilitar botón
-}
-
-- Ese botón generará la creacion de un nuevo NFT, con los datos
-  - Título _(VARIABLE INTERNA)_ → Llamado NFT PROMOCIÓN PRUEBA
-  - Nombre _(VARIABLE INTERNA)_ → En base a la wallet se define el nombre del cliente (al saber de quien se trata segun la wallet)
-  - Descripción _(META DATA)_ → A desarrollar por el cliente que lo genera
-
-### _Soluciones técnicas_:
-
-- Reutilizar el contrato del paso anterior.
-
-- Volver a generar y subir la metadata.
-
-- Habrá finalmente un boton de enviar para enviar el NFT creado
-- El NFT debe ser enviado solamente al ÚNICO holder aclarado con su dirección de wallet (cliente)
-_Luego se modificará esto para que se le envie el NFT a quien defina el desarrollado_
-
-#
-🧩 Resumen de prioridades (por importancia funcional y técnica)
-
-🔺 CRÍTICAS (bloqueantes):
-
-Validar 10 NFTs + unicidad + fechas de minteo + no retransferidos (flujo 1)
-
-Contrato de minteo desde frontend (flujo 1 y 2)
-
-Verificación de tenencia del NFT TP FINAL PRUEBA (flujo 2)
-
-🔸 MEDIAS:
-
-Formularios frontend
-
-Generación de metadata
-
-UI de botones y condiciones
-
-🔹 BAJAS:
-
-Estética final
-
-Guardado en BD de eventos
-
-Feedback visual de éxito
+Una vez minteado, el NFT de Promoción es enviado a la wallet del alumno como validación de su promoción en la materia.
