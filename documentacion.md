@@ -23,13 +23,13 @@ Este proyecto tiene como objetivo diseñar y desarrollar una aplicación descent
 
 ## 🧠 FLUJO 1. NFT TPI
 
-#### 🏠 Home Page:
+### 🏠 Home Page:
 
 La wallet del usuario se conecta automáticamente a la dApp.
 
 Se listan todos los NFTs ERC-1155 que el usuario posee.
 
-#### ✅ Validaciones para activar el botón "Enviar NFT TPI":
+### ✅ Validaciones para activar el botón "Enviar NFT TPI":
 
 El botón inferior de la página está habilitado solo si se cumplen las siguientes condiciones:
 
@@ -39,7 +39,7 @@ El botón inferior de la página está habilitado solo si se cumplen las siguien
 
 - Los NFTs **no fueron transferidos**.
 
-##### ✅ Lógica de validación:
+### ✅ Lógica de validación:
 
 Para esta validación se optó por realizar una consulta a la API de **Alchemy** creada especificamente para este proyecto, en donde se pueden realizar consultar pasando como parámetro una wallet.
 La consulta que se reliza para obtener los datos de todas las transferencias de una wallet es la siguiente:
@@ -60,7 +60,7 @@ De esta forma obtenemos los NFTs _"holdeados"_ por la wallet **address**, y asi 
 ]`
 Asi es como obtenemos los datos de transferencia de cada NFT, para verificar que sea **"TransferSingle"** y que haya sido minteado antes de **"1748380800"**, el cual es valor en digitos para la fecha "28/05/25"
 
-#### 🖱 Interacción del Usuario:
+### 🖱 Interacción del Usuario:
 
 - Si se cumplen las condiciones, el cliente podrá clickear el botón para generar ese NFT ya que cuenta con los criterios para aprobar la materia.
 - Si no se cumplen, el cliente no podrá clickearlo y se verá con opacidad baja.
@@ -75,7 +75,7 @@ _💡 Sugerencia!: Hacer la validación **en el mismo contrato** de minteo del N
 
 _💡 Bonus: Esta página contiene la misma validación de NFTs que se realiza en la Home page, y se ejecuta obteniendo la dirección de la wallet del cliente obtenida en el "path" de la URL. Por lo tanto, si un usuario sin NFTs válidos de la UNQ, fuerza la URL introduciendo su wallet en la misma, será automáticamente redirigido a la Home page_
 
-- 🧾 Los datos que contiene el NFT TPI minteado son:
+#### 🧾 Los datos que contiene el NFT TPI minteado son:
   - **Titulo**: NFT TPI _(META DATA)_
   - **Imágen**: _(META DATA)_
   - **Nombre**: _(VARIABLE INTERNA)_ → Input del cliente
@@ -91,6 +91,8 @@ _💡 Bonus: Esta página contiene la misma validación de NFTs que se realiza e
 
 La función **mintNFTPI()** contiene el **_ABI_** del contrato que mintea el NFT, e importa **ethers** para asi junto con el ABI y el provider de ethers obtener el contrato para mintear el NFT ejecutando la función mintNFT() dentro del mismo.
 
+---
+
 ## 🧠 FLUJO 2. NFT Promoción
 Desde la **Home page** se puede visualizar un segundo botón para generar un **NFT de promoción**.
 
@@ -102,7 +104,7 @@ Al **clickear** el botón, el cliente es redirigido a una página similar a la d
 
 La página cuenta con un formulario con **dos** campos: El **nombre** del alumno a promocionar y una **descripción** para informar sobre la cursada o dejar un mensaje de aprobación.
 
-🧾 Los datos que contiene el NFT Promocion son:
+#### 🧾 Los datos que contiene el NFT Promocion son:
   - **Título**: _(META DATA)_
   - **Imágen**: _(META DATA)_
   - **Nombre**: _(VARIABLE INTERNA)_ → Input del cliente que promociona escribiendo el nombre del alumno
@@ -117,7 +119,9 @@ El contrato del minteo de este NFT está inspirado en el contrato del NFT TPI, p
 
 - La función utiliza el **ABI** del NFT Promocion y el `provider` de **ethers** para llamar al contrato del NFT y asi **validar y mintear** el NFT al alumno.
 
-_Importante: El contrato del NFT tiene una práctica no recomendable, la cual es introducir la wallet a mintear en el mismo contrato. ¿Qué es lo más recomendable? Incluir un parámetro extra como se realiza en el flujo 1 para introducir la dirección a la que se busca mintear._
+_💡 Importante!: El contrato del NFT tiene una práctica no recomendable, la cual es introducir la wallet a mintear en el mismo contrato. ¿Qué es lo más recomendable? Incluir un parámetro extra como se realiza en el flujo 1 para introducir la dirección a la que se busca mintear._
+
+---
 
 ## 🎉 Resultado final:
 
