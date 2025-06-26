@@ -106,6 +106,7 @@ La página cuenta con un formulario con **dos** campos: El **nombre** del alumno
   - **Imágen**: _(META DATA)_
   - **Nombre**: _(VARIABLE INTERNA)_ → Input del cliente que promociona escribiendo el nombre del alumno
   - **Descripción**: _(VARIABLE INTERNA)_ → Input desarrollar por el cliente que lo genera
+
 Al clickear el botón para generar el NFT Promoción, se continuará la transferencia en la pestaña 🦊 **Metamask** del cliente y así enviar el NFT a al alumno promocionado.
 
 ### 🔍 _Soluciones técnicas_:
