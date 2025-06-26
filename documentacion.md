@@ -46,18 +46,17 @@ La consulta que se reliza para obtener los datos de todas las transferencias de 
 `https://eth-sepolia.g.alchemy.com/nft/v2/${ALCHEMY_API_KEY}/getNFTs?owner=${address}`
 Donde **ALCHEMY_API_KEY** es la clave privada del proyecto alchemy creado.
 
-De esta forma obtenemos los NFTs _"holdeados"_ por la wallet **address**, y asi por cada NFT hacer la segunda consulta de tipo `POST https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`, donde pasamos como parámetros los datos de los NFT de la UNQ, los cuales son:
-`params: [
-    {
+De esta forma obtenemos los NFTs _"holdeados"_ por la wallet **address**, y asi por cada NFT hacer la segunda consulta de tipo `POST`:
+-        https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}
+donde pasamos como parámetros los datos de los NFT de la UNQ, los cuales son:
+-        params: [{
       fromBlock: "0x0",
       toBlock: "latest",
       toAddress: address,
       contractAddresses: [UNQ_CONTRACT_ADDRESS],
       category: ["erc1155"],
       withMetadata: true,
-      excludeZeroValue: false,
-    },
-]`
+      excludeZeroValue: false,},]
 Asi es como obtenemos los datos de transferencia de cada NFT, para verificar que sea **"TransferSingle"** y que haya sido minteado antes de **"1748380800"**, el cual es valor en digitos para la fecha "28/05/25"
 
 ### 🖱 Interacción del Usuario:
@@ -112,10 +111,10 @@ Al clickear el botón para generar el NFT Promoción, se continuará la transfer
 ### 🔍 _Soluciones técnicas_:
 
 - 💡 **Validación** desde el contrato:
--      A diferencia del flujo anterior, en este caso la validación ocurre **dentro del contrato**, que verifica que la wallet del usuario sea **owner** de un NFT TPI, lo cual prueba que el cliente **recibió** el NFT del trabajo integrador.
+    - A diferencia del flujo anterior, en este caso la validación ocurre **dentro del contrato**, que verifica que la wallet del usuario sea **owner** de un NFT TPI, lo cual prueba que el cliente **recibió** el NFT del trabajo integrador.
 
 - 💡 **Reutilizar** el contrato del paso anterior:
--     El contrato del minteo de este NFT está inspirado en el contrato del NFT TPI, pero con el extra de **validar** en el mismo minteo que la wallet ingresada es **holder** del NFT TPI para proceder con el minteo. La decision de validar de esta forma fue aprendida por el **gran esfuerzo** que tomó realizar validaciones en el mismo Front-End de la página web.
+    - El contrato del minteo de este NFT está inspirado en el contrato del NFT TPI, pero con el extra de **validar** en el mismo minteo que la wallet ingresada es **holder** del NFT TPI para proceder con el minteo. La decision de validar de esta forma fue aprendida por el **gran esfuerzo** que tomó realizar validaciones en el mismo Front-End de la página web.
 
 - La página funciona de la misma manera que la página del flujo 1. Se llama a una función `mintNFTPromocion` La cual pasa como parámetros `nombre`, `fechaString` y `descripción`. 
 
