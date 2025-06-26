@@ -46,8 +46,7 @@ La consulta que se reliza para obtener los datos de todas las transferencias de 
 `https://eth-sepolia.g.alchemy.com/nft/v2/${ALCHEMY_API_KEY}/getNFTs?owner=${address}`
 Donde **ALCHEMY_API_KEY** es la clave privada del proyecto alchemy creado.
 
-De esta forma obtenemos los NFTs _"holdeados"_ por la wallet **address**, y asi por cada NFT hacer la segunda consulta de tipo `POST`:
--        https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}
+De esta forma obtenemos los NFTs _"holdeados"_ por la wallet **address**, y asi por cada NFT hacer la segunda consulta de tipo `POST`: `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
 donde pasamos como parámetros los datos de los NFT de la UNQ, los cuales son:
 -        params: [{
       fromBlock: "0x0",
