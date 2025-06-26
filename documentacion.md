@@ -13,8 +13,7 @@ Este proyecto tiene como objetivo diseñar y desarrollar una aplicación descent
 |      Herramienta        | Uso |
 |-------------------------|-----|
 | **Solidity**            | Contratos inteligentes (ERC-1155) |
-| **Hardhat**             | Testing y despliegue |
-| **IPFS (NFT.Storage)**  | Almacenamiento de metadata e imágenes |
+| **IPFS (Pinata)**       | Almacenamiento de imágenes |
 | **Next.js**             | Frontend web (React) |
 | **Alchemy**             | Infraestructura blockchain (API de NFTs) |
 | **Ethers.js**           | Interacción con contratos desde el frontend |
@@ -125,4 +124,4 @@ _💡 Importante!: El contrato del NFT tiene una práctica no recomendable, la c
 
 ## 🎉 Resultado final:
 
-Una vez minteado, el NFT de Promoción es enviado a la wallet del alumno como validación de su promoción en la materia.
+Una vez minteado, el NFT de Promoción es enviado a la wallet del alumno como validación de su **promoción** en la materia.
