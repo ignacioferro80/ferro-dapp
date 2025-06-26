@@ -111,11 +111,11 @@ Al clickear el botón para generar el NFT Promoción, se continuará la transfer
 
 ### 🔍 _Soluciones técnicas_:
 
-- 💡**Validación** desde el contrato
-A diferencia del flujo anterior, en este caso la validación ocurre **dentro del contrato**, que verifica que la wallet del usuario sea **owner** de un NFT TPI, lo cual prueba que el cliente **recibió** el NFT del trabajo integrador.
+- 💡 **Validación** desde el contrato:
+-      A diferencia del flujo anterior, en este caso la validación ocurre **dentro del contrato**, que verifica que la wallet del usuario sea **owner** de un NFT TPI, lo cual prueba que el cliente **recibió** el NFT del trabajo integrador.
 
-- **Reutilizar** el contrato del paso anterior.
-El contrato del minteo de este NFT está inspirado en el contrato del NFT TPI, pero con el extra de **validar** en el mismo minteo que la wallet ingresada es **holder** del NFT TPI para proceder con el minteo. La decision de validar de esta forma fue aprendida por el **gran esfuerzo** que tomó realizar validaciones en el mismo Front-End de la página web.
+- 💡 **Reutilizar** el contrato del paso anterior:
+-     El contrato del minteo de este NFT está inspirado en el contrato del NFT TPI, pero con el extra de **validar** en el mismo minteo que la wallet ingresada es **holder** del NFT TPI para proceder con el minteo. La decision de validar de esta forma fue aprendida por el **gran esfuerzo** que tomó realizar validaciones en el mismo Front-End de la página web.
 
 - La página funciona de la misma manera que la página del flujo 1. Se llama a una función `mintNFTPromocion` La cual pasa como parámetros `nombre`, `fechaString` y `descripción`. 
 
